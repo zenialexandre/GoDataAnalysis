@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"strings"
 
 	"github.com/go-gota/gota/dataframe"
@@ -12,10 +14,22 @@ func main() {
 	var asterisk string = "*"
 
 	gotaSeries()
-	fmt.Println(strings.Repeat(asterisk, 45))
+	addSpace(asterisk)
 	gotaDataFrame()
-	fmt.Println(strings.Repeat(asterisk, 45))
+	addSpace(asterisk)
 	gotaDataFrameStruct()
+	addSpace(asterisk)
+	readingJson()
+	addSpace(asterisk)
+	readingCSV()
+	addSpace(asterisk)
+	readingCSVFile()
+	addSpace(asterisk)
+	readingJsonFile()
+}
+
+func addSpace(asterisk string) {
+	fmt.Println(strings.Repeat(asterisk, 45))
 }
 
 func gotaSeries() {
@@ -82,4 +96,68 @@ func queryDogsDfColumns(dogsDf dataframe.DataFrame) {
 	fmt.Printf("Copy of the column values: %v\n", col.Copy())
 	fmt.Printf("There is a null value? %v\n", col.HasNaN())
 	fmt.Printf("Records: %v\n", col.Records())
+}
+
+func readingJson() {
+	newJson := `[
+		{
+			"Name": "John",
+			"Age": 44,
+			"Favorite Color": "Red",
+			"Height(ft)": 6.7
+		},
+		{
+			"Name": "Mary",
+			"Age": 40,
+			"Favorite Color": "Blue",
+			"Height(ft)": 5.7
+		}
+	]`
+
+	newJsonDf := dataframe.ReadJSON((strings.NewReader(newJson)))
+	fmt.Println(newJsonDf)
+}
+
+func readingCSV() {
+	newCSV := `
+		Name, Age, Favorite Color, Height(ft)
+		John, 44, Red, 6.7
+		Mary, 40, Blue, 5.7`
+
+	newCSVDf := dataframe.ReadCSV(strings.NewReader(newCSV))
+	fmt.Println(newCSVDf)
+}
+
+func readingCSVFile() {
+	file, err := os.Open("frequencyTableA.csv")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+	df := dataframe.ReadCSV(file)
+	fmt.Println(df)
+
+	// reading only the first two rows
+	rows := df.Subset([]int{0, 2})
+	fmt.Println(rows)
+
+	// selecting columns by index and by name
+	firstTwoColumns := df.Select([]int{0, 2})
+	namedColumns := df.Select([]string{"Classes"})
+	fmt.Println(firstTwoColumns)
+	fmt.Println(namedColumns)
+}
+
+func readingJsonFile() {
+	file, err := os.Open("Expense [MConverter.eu].json")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+	df := dataframe.ReadJSON(file)
+	fmt.Println(df)
 }
