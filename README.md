@@ -1,2 +1,2 @@
-# GoDataAnalysis
-Data analysis with Golang
+# go-data-analysis
+Data analysis with Golang.
